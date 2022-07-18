@@ -1,5 +1,9 @@
 {
   "column_preprocessing_info": {
+    "drop_columns": [
+      "PT_pct",
+      "PT_sec"
+    ],
     "one_hot_columns": [
       "procedure_cd_fin",
       "anesthesia_cd",
@@ -24,8 +28,6 @@
       "Hb",
       "Plt",
       "PT_inr",
-      "PT_pct",
-      "PT_sec",
       "heparins",
       "direct_factor_Xa_inhibitors",
       "coumarin_deriatives",
@@ -34,13 +36,15 @@
       
       "use_quan",
       "msbos"
-      ],
-    "drop_columns": [
-      "PT_pct",
-      "PT_sec"
+    ],
+    "cat_num_reduction_info": [
+      {
+        "column": "procedure_cd_fin",
+        "target_remained_prop": 0.5
+      }
     ]
   },
-  "outcome_info":{
+  "outcome_info": {
     "target_outcome": ["use_quan"],
     "current_practice": ["msbos"]
   }

@@ -1,0 +1,11 @@
+{
+  "column_preprocessing_info": {
+    "drop_columns": [],
+    "one_hot_columns": [],
+    "numeric_columns": []
+  },
+  "outcome_info":{
+    "target_outcome": [],
+    "current_practice": []
+  }
+}
