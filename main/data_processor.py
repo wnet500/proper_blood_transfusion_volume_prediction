@@ -5,17 +5,17 @@ import pandas as pd
 from pathlib import Path
 from typing import List, Union
 
+from main.config import train_dataset_path, test_dataset_path, dataset_info
+
 
 class DataProcessor:
   def __init__(
-      self,
-      train_dataset_path: str,
-      test_dataset_path: str
+      self
   ) -> None:
       self.data_dir = Path(__file__).parent.parent.joinpath("datasets")
       self.train_dataset_path = train_dataset_path
       self.test_dataset_path = test_dataset_path
-      self.datasets_info = self._get_datasets_info()
+      self.datasets_info = dataset_info
 
   def _get_datasets_info(self) -> dict:
     """datasets/datasets_info.json의 정보를 dict 타입으로 불러옵니다.

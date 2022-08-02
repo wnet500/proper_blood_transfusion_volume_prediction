@@ -2,13 +2,13 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from tests.config import *
+from main.config import *
 
 
 @pytest.fixture
 def data_processor():
   from main.data_processor import DataProcessor
-  return DataProcessor(train_data_file, test_data_file)
+  return DataProcessor()
 
 
 def test_get_datasets_info(data_processor):
