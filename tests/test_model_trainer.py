@@ -40,8 +40,8 @@ def test_ann_evaluation(X_y_datasets, model_trainer):
 
   ann_trainer, ann_model = model_trainer.train_ann(
       param={'num_layers': 2, 'num_units': 50},
-      num_epochs=5,
-      has_bar_callback=False,
+      num_epochs=59,
+      has_bar_callback=True,
       save_model_file="ann_model_test"
   )
   results = ann_trainer.predict(ann_model, dataloaders=testset_loader)

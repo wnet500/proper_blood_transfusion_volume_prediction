@@ -17,17 +17,6 @@ class DataProcessor:
       self.test_dataset_path = test_dataset_path
       self.datasets_info = dataset_info
 
-  def _get_datasets_info(self) -> dict:
-    """datasets/datasets_info.json의 정보를 dict 타입으로 불러옵니다.
-
-    Returns:
-        dict: 데이터셋에 대한 정보
-    """
-    with open(str(self.data_dir.joinpath("datasets_info.json")), "r") as fp:
-      datasets_info = json.load(fp)
-
-    return datasets_info
-
   def _load_raw_datasets(self) -> List[pd.DataFrame]:
     """모델 train과 test에 활용할 raw 데이터셋을 판다스 데이터프레임 타입으로 불러옵니다.
 

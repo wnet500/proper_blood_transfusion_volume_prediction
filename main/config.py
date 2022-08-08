@@ -71,3 +71,8 @@ dataset_info = {
 ## pytorch_lightning Trainer 설정
 pl_accelerator="gpu"
 pl_devices=[0]
+pl_global_seed=0
+data_loader_num_workwers=2
+
+evalset_loader_batch_size=2**12
+testset_loader_batch_size=2**13

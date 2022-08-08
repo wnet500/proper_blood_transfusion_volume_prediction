@@ -11,7 +11,7 @@ from sklearn.linear_model import LinearRegression
 from torch.utils.data import DataLoader
 from tqdm import tqdm
 
-from main.config import pl_accelerator, pl_devices
+from main.config import pl_accelerator, pl_devices, pl_global_seed, data_loader_num_workwers
 from main.torch_base import CustomDataset, ProperBloodVolPredModel
 
 
@@ -35,10 +35,10 @@ class ModelTrainer:
       evalset_loader: DataLoader = None,
       save_model_file: str = "ann_model"
   ):
-    pl.seed_everything(0, workers=True)  # Global seed setting
+    pl.seed_everything(pl_global_seed, workers=True)  # Global seed setting
 
     train_dataset = CustomDataset(self.X_train, self.y_train)
-    trainset_loader = DataLoader(train_dataset, batch_size=1024, shuffle=True, num_workers=2)
+    trainset_loader = DataLoader(train_dataset, batch_size=1024, shuffle=True, num_workers=data_loader_num_workwers)
 
     callbacks = []
     if has_bar_callback:
