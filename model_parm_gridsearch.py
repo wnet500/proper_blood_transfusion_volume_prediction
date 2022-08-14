@@ -12,9 +12,11 @@ cv = RepeatedKFold(
 )
 param_search_conductor = ParamGridSearch(cv)
 
+# =======================================================================
 # ANN parameter gridsearch
+# =======================================================================
 ann_grid_params = {
-    'num_layers': [2, 3, 4, 5],
+    'num_layers': [1, 2, 3, 4, 5],
     'num_units': [50, 100, 150]
 }
 valid_size_in_whole_datasets = 0.1

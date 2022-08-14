@@ -25,6 +25,11 @@ from main.utils import (
 
 
 class ParamGridSearch:
+  """
+  각 모델에 대해 지정한 파라미터 후보들에 대해 파라미터 조합 그리드서치를 진행하고,
+  결과를 output/gridsearch_results 폴더에 저장합니다.
+  성능 평가 지표로 mse, adjusted r square를 활용합니다.
+  """
   def __init__(
       self,
       cv=RepeatedKFold(n_splits=5, n_repeats=10, random_state=0)
@@ -148,4 +153,4 @@ class ParamGridSearch:
         axis=1
     ).sort_values(by="ann_mse_mean")
 
-    gridsearch_result_df.to_csv(str(self.ouput_dir.joinpath("gridsearch_results", "ann_results.csv")), index=True)
+    gridsearch_result_df.to_csv(str(self.ouput_dir.joinpath("gridsearch_results", "ann_results.csv")), index=False)
