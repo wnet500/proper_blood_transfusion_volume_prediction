@@ -46,7 +46,7 @@ def test_conduct_xgb_cv(param_search, valid_size_in_trainval):
       'reg_lambda': [1],
       'subsample': [1]
   }
-  tree_method = "hist" # "gpu_hist"
+  tree_method = "gpu_hist"
   param_search.conduct_xgb_cv(
       grid_params=grid_params,
       tree_method=tree_method,
