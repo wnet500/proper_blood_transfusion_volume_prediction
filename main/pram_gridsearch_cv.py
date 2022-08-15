@@ -8,7 +8,7 @@ from datetime import datetime
 from pathlib import Path
 from pytorch_lightning.callbacks import ModelCheckpoint
 from pytorch_lightning.loggers import TensorBoardLogger
-from sklearn.metrics import mean_squared_error
+from sklearn.metrics import mean_squared_error, r2_score
 from sklearn.model_selection import RepeatedKFold, ParameterGrid, train_test_split
 from torch.utils.data import DataLoader
 
@@ -28,8 +28,9 @@ class ParamGridSearch:
   """
   각 모델에 대해 지정한 파라미터 후보들에 대해 파라미터 조합 그리드서치를 진행하고,
   결과를 output/gridsearch_results 폴더에 저장합니다.
-  성능 평가 지표로 mse, adjusted r square를 활용합니다.
+  성능 평가 지표로 mse, adjusted r square, r square를 활용합니다.
   """
+
   def __init__(
       self,
       cv=RepeatedKFold(n_splits=5, n_repeats=10, random_state=0)
@@ -41,6 +42,56 @@ class ParamGridSearch:
   def _get_np_X_y_datasets(self):
     X_trainval, X_test, y_trainval, y_test = DataProcessor().make_modeling_X_y_datasets()
     return (X_trainval.values, X_test.values, y_trainval.values, y_test.values)
+
+  def conduct_current_practice_cv(self):
+    """
+    기존 프렉티스로 사용되는 msbos의 cv 수행 성능을 구합니다.
+    """
+    x_trainval, x_test, y_trainval, y_test = DataProcessor().make_current_practice_X_y_datasets()
+
+    start_time = datetime.now()
+    print("\n=======================================================================")
+    print(f"[{start_time}] Start current practice (msbos) cv")
+    print("=======================================================================")
+
+    mse_evals = []
+    r2_evals = []
+
+    for trainval_index, test_index in self.cv.split(x_trainval.values, y_trainval.values):
+      _, x_test_in = x_trainval.values[trainval_index], x_trainval.values[test_index]
+      _, y_test_in = y_trainval.values[trainval_index], y_trainval.values[test_index]
+
+      mse = mean_squared_error(y_test_in, x_test_in)
+      r2 = r2_score(y_test_in, x_test_in)
+
+      mse_evals.append(mse)
+      r2_evals.append(r2)
+
+    print(f"Current practice MSE (cv mean): {np.mean(mse_evals) :.3f}")
+    print(f"ANN Adj r2 (cv mean): {np.mean(r2_evals) :.3f}")
+    print(f"Cumulative time: {(datetime.now() - start_time).seconds / 60 :.3f} minutes\n")
+
+    mse_mean, mse_95_ci_lower, mse_95_ci_upper = get_95_conf_interval(mse_evals)
+    r2_mean, r2_95_ci_lower, r2_95_ci_upper = get_95_conf_interval(r2_evals)
+
+    result_df = pd.DataFrame({
+        "prev_practice_mse_cv_results": [mse_evals],
+        "prev_practice_r2_results": [r2_evals],
+        "prev_practice_mse_mean": [mse_mean],
+        "prev_practice_mse_95_ci_lower": [mse_95_ci_lower],
+        "prev_practice_mse_95_ci_upper": [mse_95_ci_upper],
+        "prev_practice_r2_mean": [r2_mean],
+        "prev_practice_r2_95_ci_lower": [r2_95_ci_lower],
+        "prev_practice_r2_95_ci_upper": [r2_95_ci_upper]
+    })
+
+    result_df.to_csv(
+        str(self.ouput_dir.joinpath(
+            "gridsearch_results",
+            "current_practice_msbos_results.csv"
+        )),
+        index=False
+    )
 
   def conduct_ann_cv(
       self,
@@ -154,3 +205,74 @@ class ParamGridSearch:
     ).sort_values(by="ann_mse_mean")
 
     gridsearch_result_df.to_csv(str(self.ouput_dir.joinpath("gridsearch_results", "ann_results.csv")), index=False)
+
+  def conduct_xgb_cv(
+      self,
+      grid_params: dict,
+      tree_method: str = "gpu_hist",
+      valid_size_in_trainval=1 / 8
+  ):
+    start_time = datetime.now()
+    gridsearch_results = []
+    print("\n=======================================================================")
+    print(f"[{start_time}] Start XGBoost model parameter search cv")
+    print("=======================================================================")
+
+    for param_ind, param in enumerate(ParameterGrid(grid_params)):
+      mse_evals = []
+      adj_r2_evals = []
+      best_ntree_limits = []
+
+      print()
+      print(f"[{param_ind + 1}] param:\n{param}")
+
+      for trainval_index, test_index in self.cv.split(self.X_trainval, self.y_trainval):
+        X_trainval_in, X_test_in = self.X_trainval[trainval_index], self.X_trainval[test_index]
+        y_trainval_in, y_test_in = self.y_trainval[trainval_index], self.y_trainval[test_index]
+
+        X_train_in, X_valid_in, y_train_in, y_valid_in = train_test_split(
+            X_trainval_in, y_trainval_in,
+            test_size=valid_size_in_trainval,
+            random_state=0
+        )
+
+        xgb_model = ModelTrainer(X_train_in, y_train_in).train_xgboost(
+            param=param,
+            tree_method=tree_method,
+            eval_set=[(X_valid_in, y_valid_in)],
+            n_estimators=10000
+        )
+        y_pred = adjust_pred_value(xgb_model.predict(X_test_in))
+
+        mse = mean_squared_error(y_test_in, y_pred)
+        mse_evals.append(mse)
+
+        adj_r2 = get_adjusted_r2(y_test_in, y_pred, X_test_in.shape[1])
+        adj_r2_evals.append(adj_r2)
+
+        best_ntree_limits.append(xgb_model.best_ntree_limit)
+
+      gridsearch_results.append((param, mse_evals, adj_r2_evals, best_ntree_limits))
+
+      print(f"XGBoost MSE (cv mean): {np.mean(mse_evals) :.3f}")
+      print(f"XGBoost Adj r2 (cv mean): {np.mean(adj_r2_evals) :.3f}")
+      print(f"Cumulative time: {(datetime.now() - start_time).seconds / 60 :.3f} minutes\n")
+
+    gridsearch_result_df = pd.DataFrame(
+        gridsearch_results,
+        columns=["param", "xgb_mse_cv_results", "xgb_adj_r2_cv_results", "early_stopping_rounds"]
+    )
+    gridsearch_result_df["early_stopping_round_mean"] = \
+        round(gridsearch_result_df["early_stopping_rounds"].apply(lambda x: np.mean(x)))
+
+    conf_info_mse = gridsearch_result_df["xgb_mse_cv_results"].apply(get_95_conf_interval).apply(pd.Series)
+    conf_info_mse.columns = ["xgb_mse_mean", "xgb_mse_95_ci_lower", "xgb_mse_95_ci_upper"]
+    conf_info_r2 = gridsearch_result_df["xgb_adj_r2_cv_results"].apply(get_95_conf_interval).apply(pd.Series)
+    conf_info_r2.columns = ["xgb_adj_r2_mean", "xgb_adj_r2_95_ci_lower", "xgb_adj_r2_95_ci_upper"]
+
+    gridsearch_result_df = pd.concat(
+        [gridsearch_result_df, conf_info_mse, conf_info_r2],
+        axis=1
+    ).sort_values(by="xgb_mse_mean")
+
+    gridsearch_result_df.to_csv(str(self.ouput_dir.joinpath("gridsearch_results", "xgb_results.csv")), index=False)

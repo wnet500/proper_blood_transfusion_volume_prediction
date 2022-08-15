@@ -96,3 +96,34 @@ class ModelTrainer:
       ann_model = ann_model.load_from_checkpoint(save_path)
 
     return trainer, ann_model
+
+  def train_xgboost(
+      self,
+      param: dict,
+      tree_method: str,
+      eval_set: list = None,
+      n_estimators: int = 10000
+  ):
+    xgb_model = xgboost.XGBRegressor(
+        objective="reg:squarederror",
+        random_state=0,
+        n_estimators=n_estimators,
+        tree_method=tree_method,
+        **param
+    )
+
+    if eval_set:
+      xgb_model.fit(
+          self.X_train, self.y_train,
+          early_stopping_rounds=1000,
+          eval_set=eval_set,
+          eval_metric="rmse",
+          verbose=False
+      )
+    else:
+      xgb_model.fit(
+          self.X_train, self.y_train,
+          verbose=False
+      )
+
+    return xgb_model

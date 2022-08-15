@@ -49,3 +49,25 @@ def test_ann_evaluation(X_y_datasets, model_trainer):
   print()
   print(f"ann_mse: {mean_squared_error(y_test, adjust_pred_value(y_pred)):.3f}")
   print(f"ann_adj_r2: {get_adjusted_r2(y_test, adjust_pred_value(y_pred), X_test.shape[1]):.3f}")
+
+
+def test_xgb_evaluation(X_y_datasets, model_trainer):
+  param = {
+      'colsample_bytree': 1,
+      'gamma': 0,
+      'learning_rate': 0.01,
+      'max_depth': 3,
+      'reg_lambda': 1,
+      'subsample': 1
+  }
+
+  X_test, y_test = X_y_datasets["X_test"], X_y_datasets["y_test"]
+  tree_method = "gpu_hist"
+  xgb_model = model_trainer.train_xgboost(
+      param=param,
+      tree_method=tree_method,
+      n_estimators=100)
+  y_pred = adjust_pred_value(xgb_model.predict(X_test))
+  print()
+  print(f"xgb_mse: {mean_squared_error(y_test, y_pred):.3f}")
+  print(f"xgb_adj_r2: {get_adjusted_r2(y_test, y_pred, X_test.shape[1]):.3f}")

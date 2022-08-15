@@ -98,18 +98,18 @@ def plot_blandaltman(
 
     # Define x-axis
     if xaxis == "mean":
-        xval = np.vstack((x, y)).mean(0)
-        xlabel = f"Mean of {xname} and {yname}"
+      xval = np.vstack((x, y)).mean(0)
+      xlabel = f"Mean of {xname} and {yname}"
     elif xaxis == "x":
-        xval = x
-        xlabel = xname
+      xval = x
+      xlabel = xname
     else:
-        xval = y
-        xlabel = yname
+      xval = y
+      xlabel = yname
 
     # Start the plot
     if ax is None:
-        fig, ax = plt.subplots(1, 1, figsize=figsize, dpi=dpi)
+      fig, ax = plt.subplots(1, 1, figsize=figsize, dpi=dpi)
 
     stdev = .005 * (max(xval) - min(xval))
     xval = xval + np.random.randn(len(xval)) * stdev
@@ -122,29 +122,29 @@ def plot_blandaltman(
 
     # Annotate values
     if annotate:
-        loa_range = high - low
-        offset = (loa_range / 100.0) * 1.5
-        trans = transforms.blended_transform_factory(ax.transAxes, ax.transData)
-        xloc = 0.98
-        ax.text(xloc, mean_diff + offset, "Mean", ha="right", va="bottom", transform=trans)
-        ax.text(xloc, mean_diff - offset, "%.2f" % mean_diff, ha="right", va="top", transform=trans)
-        ax.text(
-            xloc, high + offset, "+%.2f SD" % agreement, ha="right", va="bottom", transform=trans
-        )
-        ax.text(xloc, high - offset, "%.2f" % high, ha="right", va="top", transform=trans)
-        ax.text(xloc, low - offset, "-%.2f SD" % agreement, ha="right", va="top", transform=trans)
-        ax.text(xloc, low + offset, "%.2f" % low, ha="right", va="bottom", transform=trans)
+      loa_range = high - low
+      offset = (loa_range / 100.0) * 1.5
+      trans = transforms.blended_transform_factory(ax.transAxes, ax.transData)
+      xloc = 0.98
+      ax.text(xloc, mean_diff + offset, "Mean", ha="right", va="bottom", transform=trans)
+      ax.text(xloc, mean_diff - offset, "%.2f" % mean_diff, ha="right", va="top", transform=trans)
+      ax.text(
+          xloc, high + offset, "+%.2f SD" % agreement, ha="right", va="bottom", transform=trans
+      )
+      ax.text(xloc, high - offset, "%.2f" % high, ha="right", va="top", transform=trans)
+      ax.text(xloc, low - offset, "-%.2f SD" % agreement, ha="right", va="top", transform=trans)
+      ax.text(xloc, low + offset, "%.2f" % low, ha="right", va="bottom", transform=trans)
 
     # Add 95% confidence intervals for mean bias and limits of agreement
     if confidence is not None:
-        assert 0 < confidence < 1
-        ci = dict()
-        ci["mean"] = stats.t.interval(confidence, dof, loc=mean_diff, scale=mean_diff_se)
-        ci["high"] = stats.t.interval(confidence, dof, loc=high, scale=high_low_se)
-        ci["low"] = stats.t.interval(confidence, dof, loc=low, scale=high_low_se)
-        ax.axhspan(ci["mean"][0], ci["mean"][1], facecolor="tab:grey", alpha=0.2)
-        ax.axhspan(ci["high"][0], ci["high"][1], facecolor="tab:blue", alpha=0.2)
-        ax.axhspan(ci["low"][0], ci["low"][1], facecolor="tab:blue", alpha=0.2)
+      assert 0 < confidence < 1
+      ci = dict()
+      ci["mean"] = stats.t.interval(confidence, dof, loc=mean_diff, scale=mean_diff_se)
+      ci["high"] = stats.t.interval(confidence, dof, loc=high, scale=high_low_se)
+      ci["low"] = stats.t.interval(confidence, dof, loc=low, scale=high_low_se)
+      ax.axhspan(ci["mean"][0], ci["mean"][1], facecolor="tab:grey", alpha=0.2)
+      ax.axhspan(ci["high"][0], ci["high"][1], facecolor="tab:blue", alpha=0.2)
+      ax.axhspan(ci["low"][0], ci["low"][1], facecolor="tab:blue", alpha=0.2)
 
     # Labels and title
     ax.set_ylabel(f"{xname} - {yname}")

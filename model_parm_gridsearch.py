@@ -13,6 +13,11 @@ cv = RepeatedKFold(
 param_search_conductor = ParamGridSearch(cv)
 
 # =======================================================================
+# Current practice (msbos) cv
+# =======================================================================
+param_search_conductor.conduct_current_practice_cv()
+
+# =======================================================================
 # ANN parameter gridsearch
 # =======================================================================
 ann_grid_params = {
