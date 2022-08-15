@@ -1,7 +1,7 @@
 import pytest
 import torch
 
-from sklearn.metrics import mean_squared_error
+from sklearn.metrics import mean_squared_error, r2_score
 from torch.utils.data import DataLoader
 
 from main.model_trainer import ModelTrainer
@@ -66,7 +66,7 @@ def test_xgb_evaluation(X_y_datasets, model_trainer):
   xgb_model = model_trainer.train_xgboost(
       param=param,
       tree_method=tree_method,
-      n_estimators=100)
+      n_estimators=7000)
   y_pred = adjust_pred_value(xgb_model.predict(X_test))
   print()
   print(f"xgb_mse: {mean_squared_error(y_test, y_pred):.3f}")
@@ -98,3 +98,11 @@ def test_lr_evaluation(X_y_datasets, model_trainer):
   print()
   print(f"lr_mse: {mean_squared_error(y_test, y_pred):.3f}")
   print(f"lr_adj_r2: {get_adjusted_r2(y_test, y_pred, X_test.shape[1]):.3f}")
+
+
+def test_msbos_evaluation(data_processor):
+  _, msbos_test, _, true_val_test = data_processor.make_current_practice_X_y_datasets()
+
+  print()
+  print(f"msbos_mse: {mean_squared_error(true_val_test.values, msbos_test.values):.3f}")
+  print(f"msbos_r2: {r2_score(true_val_test.values, msbos_test.values):.3f}")

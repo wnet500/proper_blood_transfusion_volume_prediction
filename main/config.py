@@ -58,7 +58,7 @@ dataset_info = {
     "cat_num_reduction_info": [
       {
         "column": "procedure_cd_fin",
-        "target_remained_prop": 0.5
+        "target_remained_prop": 1
       }
     ]
   },
