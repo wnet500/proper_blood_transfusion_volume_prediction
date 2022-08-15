@@ -179,7 +179,7 @@ class ParamGridSearch:
         adj_r2 = get_adjusted_r2(y_test_in, y_pred, X_test_in.shape[1])
         adj_r2_evals.append(adj_r2)
 
-        best_epoch = int(re.search(r'epoch=(?P<epoch>\d*)', checkpoint_cb.best_model_path).group('epoch'))
+        best_epoch = int(re.search(r"epoch=(?P<epoch>\d*)", checkpoint_cb.best_model_path).group("epoch"))
         best_epochs.append(best_epoch)
 
       gridsearch_results.append((param, mse_evals, adj_r2_evals, best_epochs))

@@ -23,8 +23,8 @@ param_search_conductor.conduct_current_practice_cv()
 # ANN parameter gridsearch
 # =======================================================================
 ann_grid_params = {
-    'num_layers': [1, 2, 3],
-    'num_units': [50, 100, 150]
+    "num_layers": [1, 2, 3],
+    "num_units": [50, 100, 150]
 }  # 9
 param_search_conductor.conduct_ann_cv(
     grid_params=ann_grid_params,
@@ -35,12 +35,12 @@ param_search_conductor.conduct_ann_cv(
 # XGBoost parameter gridsearch
 # =======================================================================
 xgb_grid_params = {
-    'bootstrap': [True, False],
-    'max_depth': [10, 50, None],
-    'max_features': ["auto", "sqrt"],
-    'min_samples_leaf': [1, 2],
-    'min_samples_split': [2, 5, 10],
-    'n_estimators': [100, 500]
+    "colsample_bytree": [0.8, 1],
+    "gamma": [0, 0.1],
+    "learning_rate": [0.01, 0.1],
+    "max_depth": [3, 5, 7],
+    "reg_lambda": [1, 2, 3],
+    "subsample": [0.8, 1]
 }  # 144
 tree_method = "gpu_hist"
 param_search_conductor.conduct_xgb_cv(

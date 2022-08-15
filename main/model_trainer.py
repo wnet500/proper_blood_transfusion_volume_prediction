@@ -1,3 +1,4 @@
+import joblib
 import numpy as np
 import pytorch_lightning as pl
 import xgboost
@@ -103,7 +104,7 @@ class ModelTrainer:
       tree_method: str,
       eval_set: list = None,
       n_estimators: int = 10000,
-      save_model_file: str = "xgb_model"
+      save_model_file: str = None
   ):
     xgb_model = xgboost.XGBRegressor(
         objective="reg:squarederror",
@@ -127,7 +128,32 @@ class ModelTrainer:
           verbose=False
       )
 
-    save_path = str(self.ouput_dir.joinpath("traditional_ml_models", f"{save_model_file}.json"))
-    xgb_model.save_model(save_path)
+    if save_model_file:
+      save_path = str(self.ouput_dir.joinpath("traditional_ml_models", f"{save_model_file}.json"))
+      xgb_model.save_model(save_path)
 
     return xgb_model
+
+  def train_linear_regression(self, save_model_file: str = None):
+    lr_model = LinearRegression()
+    lr_model.fit(self.X_train, self.y_train)
+
+    if save_model_file:
+      save_path = str(self.ouput_dir.joinpath("traditional_ml_models", f"{save_model_file}.joblib"))
+      joblib.dump(lr_model, save_path)
+
+    return lr_model
+
+  def train_random_forest(
+      self,
+      param: dict,
+      save_model_file: str = None
+  ):
+    rf_model = RandomForestRegressor(random_state=0, n_jobs=-1, **param)
+    rf_model.fit(self.X_train, self.y_train)
+
+    if save_model_file:
+      save_path = str(self.ouput_dir.joinpath("traditional_ml_models", f"{save_model_file}.joblib"))
+      joblib.dump(rf_model, save_path)
+
+    return rf_model

@@ -28,8 +28,8 @@ def test_conduct_msbos_cv(param_search):
 
 def test_conduct_ann_cv(param_search, valid_size_in_trainval):
   grid_params = {
-      'num_layers': [2],
-      'num_units': [50, 100]
+      "num_layers": [2],
+      "num_units": [50, 100]
   }
   param_search.conduct_ann_cv(
       grid_params=grid_params,
@@ -39,12 +39,12 @@ def test_conduct_ann_cv(param_search, valid_size_in_trainval):
 
 def test_conduct_xgb_cv(param_search, valid_size_in_trainval):
   grid_params = {
-      'colsample_bytree': [1],
-      'gamma': [0],
-      'learning_rate': [0.01],
-      'max_depth': [3, 5],
-      'reg_lambda': [1],
-      'subsample': [1]
+      "colsample_bytree": [1],
+      "gamma": [0],
+      "learning_rate": [0.01],
+      "max_depth": [3, 5],
+      "reg_lambda": [1],
+      "subsample": [1]
   }
   tree_method = "gpu_hist"
   param_search.conduct_xgb_cv(

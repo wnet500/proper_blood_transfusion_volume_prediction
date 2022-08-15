@@ -131,7 +131,7 @@ class ProperBloodVolPredModel(pl.LightningModule):
       metrics = {"val_loss": loss}
       self.log_dict(metrics, prog_bar=True)
 
-      return {'loss': loss}
+      return {"loss": loss}
 
   def predict_step(self, batch, batch_idx):
       x, y = batch

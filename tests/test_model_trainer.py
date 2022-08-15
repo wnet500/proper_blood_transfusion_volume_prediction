@@ -39,7 +39,7 @@ def test_ann_evaluation(X_y_datasets, model_trainer):
   disable_logging_and_userwaring()
 
   ann_trainer, ann_model = model_trainer.train_ann(
-      param={'num_layers': 2, 'num_units': 50},
+      param={"num_layers": 2, "num_units": 50},
       num_epochs=59,
       has_bar_callback=True,
       save_model_file="ann_model_test"
@@ -53,12 +53,12 @@ def test_ann_evaluation(X_y_datasets, model_trainer):
 
 def test_xgb_evaluation(X_y_datasets, model_trainer):
   param = {
-      'colsample_bytree': 1,
-      'gamma': 0,
-      'learning_rate': 0.01,
-      'max_depth': 3,
-      'reg_lambda': 1,
-      'subsample': 1
+      "colsample_bytree": 1,
+      "gamma": 0,
+      "learning_rate": 0.01,
+      "max_depth": 3,
+      "reg_lambda": 1,
+      "subsample": 1
   }
 
   X_test, y_test = X_y_datasets["X_test"], X_y_datasets["y_test"]
@@ -71,3 +71,7 @@ def test_xgb_evaluation(X_y_datasets, model_trainer):
   print()
   print(f"xgb_mse: {mean_squared_error(y_test, y_pred):.3f}")
   print(f"xgb_adj_r2: {get_adjusted_r2(y_test, y_pred, X_test.shape[1]):.3f}")
+
+
+def test_rf_evaluation(X_y_datasets, model_trainer):
+  pass
