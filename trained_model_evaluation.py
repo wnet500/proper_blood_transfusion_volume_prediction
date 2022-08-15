@@ -1,4 +1,5 @@
 # %%
+import joblib
 import pandas as pd
 import torch
 import xgboost
@@ -87,12 +88,57 @@ print("XGBoost model evaluation")
 print("=======================================================================")
 print(f"MSE: {xgb_mse :.3f}")
 print(f"Adjusted r square: {xgb_adj_r2 :.3f}")
+
+# =======================================================================
+# %% Linear Regression model evaluation with test dataset
+# =======================================================================
+lr_model = joblib.load("output/traditional_ml_models/trained_lr_model.joblib")
+
+lr_y_pred = lr_model.predict(X_test.values)
+
+lr_mse = mean_squared_error(
+    y_test.values, adjust_pred_value(lr_y_pred)
+)
+lr_adj_r2 = get_adjusted_r2(
+    y_test.values,
+    adjust_pred_value(lr_y_pred),
+    X_test.shape[1]
+)
+print()
+print("=======================================================================")
+print("Linear Regression model evaluation")
+print("=======================================================================")
+print(f"MSE: {lr_mse :.3f}")
+print(f"Adjusted r square: {lr_adj_r2 :.3f}")
+
+# =======================================================================
+# %% Random Forest model evaluation with test dataset
+# =======================================================================
+rf_model = joblib.load("output/traditional_ml_models/trained_rf_model.joblib")
+
+rf_y_pred = rf_model.predict(X_test.values)
+
+rf_mse = mean_squared_error(
+    y_test.values, adjust_pred_value(rf_y_pred)
+)
+rf_adj_r2 = get_adjusted_r2(
+    y_test.values,
+    adjust_pred_value(rf_y_pred),
+    X_test.shape[1]
+)
+print()
+print("=======================================================================")
+print("Random Forest model evaluation")
+print("=======================================================================")
+print(f"MSE: {rf_mse :.3f}")
+print(f"Adjusted r square: {rf_adj_r2 :.3f}")
+
 # %%
 evaluation_result_df = pd.DataFrame(
     {
-        "model": ["msbos", "ann", "xgboost"],
-        "mse": [msbos_mse, ann_mse, xgb_mse],
-        "r2": [msbos_r2, ann_adj_r2, xgb_adj_r2]
+        "model": ["msbos", "ann", "xgboost", "lr", "rf"],
+        "mse": [msbos_mse, ann_mse, xgb_mse, lr_mse, rf_mse],
+        "r2": [msbos_r2, ann_adj_r2, xgb_adj_r2, lr_adj_r2, rf_adj_r2]
     }
 )
 evaluation_result_df.to_csv("output/model_evaluation_results.csv", index=False)
@@ -104,3 +150,9 @@ save_blandaltman(y_test.values, adjust_pred_value(ann_y_pred), "ann_bland_altman
 
 save_blandaltman(y_test.values, xgb_y_pred, "xgb_bland_altman_plot_raw")
 save_blandaltman(y_test.values, adjust_pred_value(xgb_y_pred), "xgb_bland_altman_plot_adj")
+
+save_blandaltman(y_test.values, lr_y_pred, "lr_bland_altman_plot_raw")
+save_blandaltman(y_test.values, adjust_pred_value(lr_y_pred), "lr_bland_altman_plot_adj")
+
+save_blandaltman(y_test.values, rf_y_pred, "rf_bland_altman_plot_raw")
+save_blandaltman(y_test.values, adjust_pred_value(rf_y_pred), "rf_bland_altman_plot_adj")

@@ -52,3 +52,19 @@ def test_conduct_xgb_cv(param_search, valid_size_in_trainval):
       tree_method=tree_method,
       valid_size_in_trainval=valid_size_in_trainval
   )
+
+
+def test_conduct_lr_cv(param_search):
+  param_search.conduct_lr_cv()
+
+
+def test_conduct_rf_cv(param_search):
+  grid_params = {
+      'bootstrap': [False],
+      'max_depth': [50, None],
+      'max_features': ["auto", "sqrt"],
+      'min_samples_leaf': [2],
+      'min_samples_split': [2],
+      'n_estimators': [1000]
+  }
+  param_search.conduct_rf_cv(grid_params)

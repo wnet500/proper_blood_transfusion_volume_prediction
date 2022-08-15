@@ -276,3 +276,95 @@ class ParamGridSearch:
     ).sort_values(by="xgb_mse_mean")
 
     gridsearch_result_df.to_csv(str(self.ouput_dir.joinpath("gridsearch_results", "xgb_results.csv")), index=False)
+
+  def conduct_lr_cv(self):
+    start_time = datetime.now()
+    print("\n=======================================================================")
+    print(f"[{start_time}] Start Linear Regression model parameter search cv")
+    print("=======================================================================")
+
+    mse_evals = []
+    adj_r2_evals = []
+
+    for trainval_index, test_index in self.cv.split(self.X_trainval, self.y_trainval):
+      X_train_in, X_test_in = self.X_trainval[trainval_index], self.X_trainval[test_index]
+      y_train_in, y_test_in = self.y_trainval[trainval_index], self.y_trainval[test_index]
+
+      lr_model = ModelTrainer(X_train_in, y_train_in).train_linear_regression()
+      y_pred = adjust_pred_value(lr_model.predict(X_test_in))
+      y_pred = np.where(y_pred > 15, 15, y_pred)
+
+      mse = mean_squared_error(y_test_in, y_pred)
+      mse_evals.append(mse)
+
+      adj_r2 = get_adjusted_r2(y_test_in, y_pred, X_test_in.shape[1])
+      adj_r2_evals.append(adj_r2)
+
+    print(f"Linear Regression MSE (cv mean): {np.mean(mse_evals) :.3f}")
+    print(f"Linear Regression Adj r2 (cv mean): {np.mean(adj_r2_evals) :.3f}")
+    print(f"Cumulative time: {(datetime.now() - start_time).seconds / 60 :.3f} minutes\n")
+
+    lr_mse_mean, lr_mse_95_ci_lower, lr_mse_95_ci_upper = get_95_conf_interval(mse_evals)
+    lr_adj_r2_mean, lr_adj_r2_95_ci_lower, lr_adj_r2_95_ci_upper = get_95_conf_interval(adj_r2_evals)
+
+    result_df = pd.DataFrame({
+        "lr_mse_cv_results": [mse_evals],
+        "lr_adj_r2_results": [adj_r2_evals],
+        "lr_mse_mean": [lr_mse_mean],
+        "lr_mse_95_ci_lower": [lr_mse_95_ci_lower],
+        "lr_mse_95_ci_upper": [lr_mse_95_ci_upper],
+        "lr_adj_r2_mean": [lr_adj_r2_mean],
+        "lr_adj_r2_95_ci_lower": [lr_adj_r2_95_ci_lower],
+        "lr_adj_r2_95_ci_upper": [lr_adj_r2_95_ci_upper]
+    })
+
+    result_df.to_csv(str(self.ouput_dir.joinpath("gridsearch_results", "lr_results.csv")), index=False)
+
+  def conduct_rf_cv(self, grid_params: dict):
+    start_time = datetime.now()
+    gridsearch_results = []
+    print("\n=======================================================================")
+    print(f"[{start_time}] Start Random Forest model parameter search cv")
+    print("=======================================================================")
+
+    for param_ind, param in enumerate(ParameterGrid(grid_params)):
+      mse_evals = []
+      adj_r2_evals = []
+
+      print()
+      print(f"[{param_ind + 1}] param:\n{param}")
+
+      for train_index, test_index in self.cv.split(self.X_trainval, self.y_trainval):
+        X_train_in, X_test_in = self.X_trainval[train_index], self.X_trainval[test_index]
+        y_train_in, y_test_in = self.y_trainval[train_index], self.y_trainval[test_index]
+
+        rf_model = ModelTrainer(X_train_in, y_train_in).train_random_forest(param)
+        y_pred = adjust_pred_value(rf_model.predict(X_test_in))
+
+        mse = mean_squared_error(y_test_in, y_pred)
+        mse_evals.append(mse)
+
+        adj_r2 = get_adjusted_r2(y_test_in, y_pred, X_test_in.shape[1])
+        adj_r2_evals.append(adj_r2)
+
+      gridsearch_results.append((param, mse_evals, adj_r2_evals))
+
+      print(f"Random Forest MSE (cv mean): {np.mean(mse_evals) :.3f}")
+      print(f"Random Forest Adj r2 (cv mean): {np.mean(adj_r2_evals) :.3f}")
+      print(f"Cumulative time: {(datetime.now() - start_time).seconds / 60 :.3f} minutes\n")
+
+    gridsearch_result_df = pd.DataFrame(
+        gridsearch_results,
+        columns=["param", "rf_mse_cv_results", "rf_adj_r2_cv_results"]
+    )
+    conf_info_mse = gridsearch_result_df["rf_mse_cv_results"].apply(get_95_conf_interval).apply(pd.Series)
+    conf_info_mse.columns = ["rf_mse_mean", "rf_mse_95_ci_lower", "rf_mse_95_ci_upper"]
+    conf_info_r2 = gridsearch_result_df["rf_adj_r2_cv_results"].apply(get_95_conf_interval).apply(pd.Series)
+    conf_info_r2.columns = ["rf_adj_r2_mean", "rf_adj_r2_95_ci_lower", "rf_adj_r2_95_ci_upper"]
+
+    gridsearch_result_df = pd.concat(
+        [gridsearch_result_df, conf_info_mse, conf_info_r2],
+        axis=1
+    ).sort_values(by="rf_mse_mean")
+
+    gridsearch_result_df.to_csv(str(self.ouput_dir.joinpath("gridsearch_results", "rf_results.csv")), index=False)

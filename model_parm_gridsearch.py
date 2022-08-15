@@ -48,3 +48,16 @@ param_search_conductor.conduct_xgb_cv(
     tree_method=tree_method,
     valid_size_in_trainval=valid_size_in_trainval
 )
+
+# =======================================================================
+# Random Forest parameter gridsearch
+# =======================================================================
+rf_grid_params = {
+    'bootstrap': [True, False],
+    'max_depth': [10, 50, None],
+    'max_features': ["sqrt"],
+    'min_samples_leaf': [1, 2, 4],
+    'min_samples_split': [2, 5, 10],
+    'n_estimators': [100, 500, 1000]
+}  # 162
+param_search_conductor.conduct_rf_cv(rf_grid_params)

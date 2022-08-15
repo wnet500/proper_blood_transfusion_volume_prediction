@@ -74,4 +74,27 @@ def test_xgb_evaluation(X_y_datasets, model_trainer):
 
 
 def test_rf_evaluation(X_y_datasets, model_trainer):
-  pass
+  param = {
+      'bootstrap': False,
+      'max_depth': 50,
+      'max_features': 'sqrt',
+      'min_samples_leaf': 2,
+      'min_samples_split': 2,
+      'n_estimators': 1000
+  }
+
+  X_test, y_test = X_y_datasets["X_test"], X_y_datasets["y_test"]
+  rf_model = model_trainer.train_random_forest(param=param)
+  y_pred = adjust_pred_value(rf_model.predict(X_test))
+  print()
+  print(f"rf_mse: {mean_squared_error(y_test, y_pred):.3f}")
+  print(f"rf_adj_r2: {get_adjusted_r2(y_test, y_pred, X_test.shape[1]):.3f}")
+
+
+def test_lr_evaluation(X_y_datasets, model_trainer):
+  X_test, y_test = X_y_datasets["X_test"], X_y_datasets["y_test"]
+  lr_model = model_trainer.train_linear_regression()
+  y_pred = adjust_pred_value(lr_model.predict(X_test))
+  print()
+  print(f"lr_mse: {mean_squared_error(y_test, y_pred):.3f}")
+  print(f"lr_adj_r2: {get_adjusted_r2(y_test, y_pred, X_test.shape[1]):.3f}")

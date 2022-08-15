@@ -45,3 +45,23 @@ xgb_model = model_trainer.train_xgboost(
     n_estimators=int(xgb_best_param["early_stopping_round_mean"][0]),
     save_model_file="trained_xgb_model"
 )
+
+# =======================================================================
+# %% Linear Regression model training
+# =======================================================================
+lr_model = model_trainer.train_linear_regression(save_model_file="trained_lr_model")
+
+
+# =======================================================================
+# %% Random Forest model training
+# =======================================================================
+rf_param_search_results = pd.read_csv("output/gridsearch_results/rf_results.csv")
+rf_best_param = \
+    rf_param_search_results\
+    .sort_values(by="rf_mse_mean")\
+    .head(1)[["param"]]
+
+rf_model = model_trainer.train_random_forest(
+    param=eval(rf_best_param["param"][0]),
+    save_model_file="trained_rf_model"
+)
