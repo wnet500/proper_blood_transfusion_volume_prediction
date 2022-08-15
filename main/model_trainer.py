@@ -102,7 +102,8 @@ class ModelTrainer:
       param: dict,
       tree_method: str,
       eval_set: list = None,
-      n_estimators: int = 10000
+      n_estimators: int = 10000,
+      save_model_file: str = "xgb_model"
   ):
     xgb_model = xgboost.XGBRegressor(
         objective="reg:squarederror",
@@ -125,5 +126,8 @@ class ModelTrainer:
           self.X_train, self.y_train,
           verbose=False
       )
+
+    save_path = str(self.ouput_dir.joinpath("traditional_ml_models", f"{save_model_file}.json"))
+    xgb_model.save_model(save_path)
 
     return xgb_model
