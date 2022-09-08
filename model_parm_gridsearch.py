@@ -24,8 +24,8 @@ param_search_conductor.conduct_current_practice_cv()
 # =======================================================================
 ann_grid_params = {
     "num_layers": [1, 2, 3],
-    "num_units": [50, 100, 150]
-}  # 9
+    "num_units": [50, 100, 150, 70, 140, 210]
+}  # 18
 param_search_conductor.conduct_ann_cv(
     grid_params=ann_grid_params,
     valid_size_in_trainval=valid_size_in_trainval
