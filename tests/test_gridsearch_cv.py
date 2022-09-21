@@ -5,7 +5,7 @@ from sklearn.model_selection import RepeatedKFold
 from main.pram_gridsearch_cv import ParamGridSearch
 
 CV_N_SPLITS = 5
-CV_N_REPEATS = 1
+CV_N_REPEATS = 3
 
 VALID_SIZE_IN_WHOLE_DATA = 0.1
 
@@ -68,3 +68,20 @@ def test_conduct_rf_cv(param_search):
       'n_estimators': [1000]
   }
   param_search.conduct_rf_cv(grid_params)
+
+def test_conduct_mlp_cv(param_search):
+  grid_params = {
+      "hidden_layer_sizes": [
+          [60, 30, 15, 7],
+          [120, 60, 30, 15],
+          [180, 120, 60, 30],
+          [60, 30, 15],
+          [120, 60, 30],
+          [180, 120, 60],
+          [60, 30],
+          [120, 60],
+          [180, 60]
+      ],
+      "max_iter": [200, 500, 1000]
+  }
+  param_search.conduct_mlp_cv(grid_params)

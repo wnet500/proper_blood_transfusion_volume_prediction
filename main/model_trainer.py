@@ -9,6 +9,7 @@ from pytorch_lightning.callbacks.early_stopping import EarlyStopping
 from pytorch_lightning.loggers import TensorBoardLogger
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.linear_model import LinearRegression
+from sklearn.neural_network import MLPRegressor
 from torch.utils.data import DataLoader
 from tqdm import tqdm
 
@@ -157,3 +158,17 @@ class ModelTrainer:
       joblib.dump(rf_model, save_path)
 
     return rf_model
+
+  def train_mlp(
+      self,
+      param: dict,
+      save_model_file: str = None
+  ):
+    mlp_model = MLPRegressor(random_state=0, **param)
+    mlp_model.fit(self.X_train, self.y_train)
+
+    if save_model_file:
+      save_path = str(self.ouput_dir.joinpath("traditional_ml_models", f"{save_model_file}.joblib"))
+      joblib.dump(mlp_model, save_path)
+
+    return mlp_model

@@ -180,7 +180,7 @@ class ParamGridSearch:
         adj_r2_evals.append(adj_r2)
 
         best_epoch = int(re.search(r"epoch=(?P<epoch>\d*)", checkpoint_cb.best_model_path).group("epoch"))
-        best_epochs.append(best_epoch)
+        best_epochs.append(best_epoch + 1)
 
       gridsearch_results.append((param, mse_evals, adj_r2_evals, best_epochs))
 
@@ -368,3 +368,52 @@ class ParamGridSearch:
     ).sort_values(by="rf_mse_mean")
 
     gridsearch_result_df.to_csv(str(self.ouput_dir.joinpath("gridsearch_results", "rf_results.csv")), index=False)
+
+  def conduct_mlp_cv(self, grid_params: dict):
+    start_time = datetime.now()
+    gridsearch_results = []
+    print("\n=======================================================================")
+    print(f"[{start_time}] Start MLP model parameter search cv")
+    print("=======================================================================")
+
+    for param_ind, param in enumerate(ParameterGrid(grid_params)):
+      mse_evals = []
+      adj_r2_evals = []
+
+      print()
+      print(f"[{param_ind + 1}] param:\n{param}")
+
+      for train_index, test_index in self.cv.split(self.X_trainval, self.y_trainval):
+        X_train_in, X_test_in = self.X_trainval[train_index], self.X_trainval[test_index]
+        y_train_in, y_test_in = self.y_trainval[train_index], self.y_trainval[test_index]
+
+        mlp_model = ModelTrainer(X_train_in, y_train_in).train_mlp(param)
+        y_pred = adjust_pred_value(mlp_model.predict(X_test_in))
+
+        mse = mean_squared_error(y_test_in, y_pred)
+        mse_evals.append(mse)
+
+        adj_r2 = get_adjusted_r2(y_test_in, y_pred, X_test_in.shape[1])
+        adj_r2_evals.append(adj_r2)
+
+      gridsearch_results.append((param, mse_evals, adj_r2_evals))
+
+      print(f"MLP MSE (cv mean): {np.mean(mse_evals) :.3f}")
+      print(f"MLP Adj r2 (cv mean): {np.mean(adj_r2_evals) :.3f}")
+      print(f"Cumulative time: {(datetime.now() - start_time).seconds / 60 :.3f} minutes\n")
+
+    gridsearch_result_df = pd.DataFrame(
+        gridsearch_results,
+        columns=["param", "mlp_mse_cv_results", "mlp_adj_r2_cv_results"]
+    )
+    conf_info_mse = gridsearch_result_df["mlp_mse_cv_results"].apply(get_95_conf_interval).apply(pd.Series)
+    conf_info_mse.columns = ["mlp_mse_mean", "mlp_mse_95_ci_lower", "mlp_mse_95_ci_upper"]
+    conf_info_r2 = gridsearch_result_df["mlp_adj_r2_cv_results"].apply(get_95_conf_interval).apply(pd.Series)
+    conf_info_r2.columns = ["mlp_adj_r2_mean", "mlp_adj_r2_95_ci_lower", "mlp_adj_r2_95_ci_upper"]
+
+    gridsearch_result_df = pd.concat(
+        [gridsearch_result_df, conf_info_mse, conf_info_r2],
+        axis=1
+    ).sort_values(by="mlp_mse_mean")
+
+    gridsearch_result_df.to_csv(str(self.ouput_dir.joinpath("gridsearch_results", "mlp_results.csv")), index=False)

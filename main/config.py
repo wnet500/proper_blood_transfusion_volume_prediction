@@ -13,8 +13,8 @@
 ### target_outcome: 모델 아웃컴 컬럼
 ### current_practice: 모델의 성능과 비교할 현재 프렉티스 컬럼
 
-train_dataset_path = "../datasets/train_df3.csv"
-test_dataset_path = "../datasets/test_df3.csv"
+train_dataset_path = "../datasets/train_df4.csv"
+test_dataset_path = "../datasets/test_df4.csv"
 
 dataset_info = {
   "column_preprocessing_info": {

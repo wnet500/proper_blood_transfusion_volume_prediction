@@ -156,7 +156,8 @@ def plot_blandaltman(
 def save_blandaltman(
     observed_values: Union[List, np.ndarray],
     predicted_values: Union[List, np.ndarray],
-    file_name: str
+    file_name: str,
+    xticks_step: int = 3
 ):
   """bland altman 플랏을 보여주고, png 파일을 output/plots 폴더에 저장합니다.
 
@@ -175,7 +176,7 @@ def save_blandaltman(
       xaxis="x",
       dpi=300
   )
-  plt.xticks(range(int(max(observed_values)) + 1))
+  plt.xticks(range(0, int(max(observed_values)) + 1, xticks_step))
   plt.tight_layout()
   plt.savefig(ouput_dir.joinpath("plots").joinpath(f"{file_name}.png"), dpi=300)
   plt.show()

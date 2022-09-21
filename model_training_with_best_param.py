@@ -40,7 +40,7 @@ xgb_best_param = \
 tree_method = "gpu_hist"
 
 xgb_model = model_trainer.train_xgboost(
-    param=eval(ann_best_param["param"][0]),
+    param=eval(xgb_best_param["param"][0]),
     tree_method=tree_method,
     n_estimators=int(xgb_best_param["early_stopping_round_mean"][0]),
     save_model_file="trained_xgb_model"
