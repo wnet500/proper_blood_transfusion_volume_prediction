@@ -20,51 +20,46 @@ dataset_info = {
   "column_preprocessing_info": {
     "drop_columns": [
       "PT_pct",
-      "PT_sec"
-    ],
-    "one_hot_columns": [
+      "PT_sec",
       "procedure_cd_fin",
       "anesthesia_cd",
-      "sex"
-    ],
-    "numeric_columns": [
+      "sex",
       "age",
-      "ami",
       "chf",
       "pud",
       "mld",
       "diab",
       "diabwc",
       "hp",
-      "rend",
-      "canc",
       "msld",
       "metacanc",
       "aids",
       "score",
+      "heparins",
+      "direct_factor_Xa_inhibitors",
+      "miscellaneous_anticoagulants",
+      "direct_thrombin_inhibitors",     
+    ],
+    "one_hot_columns": [
+    ],
+    "numeric_columns": [
+      "ami",
+      "rend",
+      "canc",
       "aPTT",
       "Hb",
       "Plt",
       "PT_inr",
-      "heparins",
-      "direct_factor_Xa_inhibitors",
       "coumarin_deriatives",
-      "miscellaneous_anticoagulants",
-      "direct_thrombin_inhibitors",
       
       "use_quan",
       "msbos"
     ],
     "cat_num_reduction_info": [
-      {
-        "column": "procedure_cd_fin",
-        "target_remained_prop": 1
-      }
     ]
   },
   "outcome_info": {
-    "target_outcome": ["use_quan"],
-    "current_practice": ["msbos"]
+    "target_outcome": ["use_quan"]
   }
 }
 

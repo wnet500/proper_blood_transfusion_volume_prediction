@@ -69,6 +69,7 @@ def test_conduct_rf_cv(param_search):
   }
   param_search.conduct_rf_cv(grid_params)
 
+
 def test_conduct_mlp_cv(param_search):
   grid_params = {
       "hidden_layer_sizes": [
