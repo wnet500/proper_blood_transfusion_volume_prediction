@@ -76,7 +76,7 @@ def test_xgb_evaluation(X_y_datasets, model_trainer):
 def test_rf_evaluation(X_y_datasets, model_trainer):
   param = {
       "bootstrap": False,
-      "max_depth": None,
+      "max_depth": 50,
       "max_features": "sqrt",
       "min_samples_leaf": 1,
       "min_samples_split": 5,
