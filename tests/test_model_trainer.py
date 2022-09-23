@@ -60,7 +60,7 @@ def test_xgb_evaluation(X_y_datasets, model_trainer):
       "reg_lambda": 1,
       "subsample": 0.8
   }
-  
+
   X_test, y_test = X_y_datasets["X_test"], X_y_datasets["y_test"]
   tree_method = "gpu_hist"
   xgb_model = model_trainer.train_xgboost(
@@ -106,6 +106,7 @@ def test_msbos_evaluation(data_processor):
   print()
   print(f"msbos_mse: {mean_squared_error(true_val_test.values, msbos_test.values):.3f}")
   print(f"msbos_r2: {r2_score(true_val_test.values, msbos_test.values):.3f}")
+
 
 def test_mlp_evaluation(X_y_datasets, model_trainer):
   param = {
