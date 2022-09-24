@@ -10,7 +10,7 @@ X_train, _, y_train, _ = DataProcessor().make_modeling_X_y_datasets()
 model_trainer = ModelTrainer(X_train, y_train)
 
 # =======================================================================
-# %% ANN model training
+# %% ANN (pytorch) model training
 # =======================================================================
 ann_param_search_results = pd.read_csv("output/gridsearch_results/ann_results.csv")
 
@@ -64,4 +64,18 @@ rf_best_param = \
 rf_model = model_trainer.train_random_forest(
     param=eval(rf_best_param["param"][0]),
     save_model_file="trained_rf_model"
+)
+
+# =======================================================================
+# %% ANN (sklearn) model training
+# =======================================================================
+mlp_param_search_results = pd.read_csv("output/gridsearch_results/mlp_results.csv")
+mlp_best_param = \
+    mlp_param_search_results\
+    .sort_values(by="mlp_mse_mean")\
+    .head(1)[["param"]]
+
+mlp_model = model_trainer.train_mlp(
+    param=eval(mlp_best_param["param"][0]),
+    save_model_file="trained_mlp_model"
 )
