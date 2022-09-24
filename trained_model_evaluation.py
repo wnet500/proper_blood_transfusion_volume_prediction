@@ -156,6 +156,10 @@ print(f"MSE: {mlp_mse :.3f}")
 print(f"Adjusted r square: {mlp_adj_r2 :.3f}")
 
 # %%
+print()
+print("=======================================================================")
+print("Model Evaluation Result")
+print("=======================================================================")
 evaluation_result_df = pd.DataFrame(
     {
         "model": ["msbos", "ann", "xgboost", "lr", "rf", "mlp"],
@@ -165,6 +169,11 @@ evaluation_result_df = pd.DataFrame(
 )
 evaluation_result_df.to_csv("output/model_evaluation_results.csv", index=False)
 
+# %%
+print()
+print("=======================================================================")
+print("Blan Altman Plotting")
+print("=======================================================================")
 save_blandaltman(true_val_test.values, msbos_test.values, "msbos_bland_altman_plot")
 
 save_blandaltman(y_test.values, ann_y_pred, "ann_bland_altman_plot_raw")
