@@ -25,7 +25,7 @@ param_search_conductor.conduct_current_practice_cv()
 param_search_conductor.conduct_lr_cv()
 
 # =======================================================================
-# ANN parameter gridsearch
+# ANN (pytorch) parameter gridsearch
 # =======================================================================
 ann_grid_params = {
     "num_layers": [1, 2, 3],
@@ -68,3 +68,23 @@ rf_grid_params = {
     'n_estimators': [100, 500, 1000]
 }  # 162
 param_search_conductor.conduct_rf_cv(rf_grid_params)
+
+# =======================================================================
+# ANN (sklearn) parameter gridsearch
+# =======================================================================
+mlp_grid_params = {
+    "hidden_layer_sizes": [
+        [100],
+        [100, 100],
+        [100, 50, 25],
+        [100, 100, 50],
+        [100, 50],
+        [50],
+        [50, 50],
+        [50, 25, 13],
+        [50, 50, 25],
+        [50, 25]
+    ],
+    "max_iter": [200]
+}
+param_search_conductor.conduct_mlp_cv(mlp_grid_params)
