@@ -29,7 +29,7 @@ print(f"MSE: {msbos_mse :.3f}")
 print(f"Adjusted r square: {msbos_r2 :.3f}")
 
 # =======================================================================
-# %% ANN model evaluation with test dataset
+# %% ANN (pytorch) model evaluation with test dataset
 # =======================================================================
 ann_param_search_results = pd.read_csv("output/gridsearch_results/ann_results.csv")
 
@@ -133,12 +133,34 @@ print("=======================================================================")
 print(f"MSE: {rf_mse :.3f}")
 print(f"Adjusted r square: {rf_adj_r2 :.3f}")
 
+# =======================================================================
+# %% ANN (sklearn) model evaluation with test dataset
+# =======================================================================
+mlp_model = joblib.load("output/traditional_ml_models/trained_mlp_model.joblib")
+
+mlp_y_pred = mlp_model.predict(X_test.values)
+
+mlp_mse = mean_squared_error(
+    y_test.values, adjust_pred_value(mlp_y_pred)
+)
+mlp_adj_r2 = get_adjusted_r2(
+    y_test.values,
+    adjust_pred_value(mlp_y_pred),
+    X_test.shape[1]
+)
+print()
+print("=======================================================================")
+print("ANN (sklearn) model evaluation")
+print("=======================================================================")
+print(f"MSE: {mlp_mse :.3f}")
+print(f"Adjusted r square: {mlp_adj_r2 :.3f}")
+
 # %%
 evaluation_result_df = pd.DataFrame(
     {
-        "model": ["msbos", "ann", "xgboost", "lr", "rf"],
-        "mse": [msbos_mse, ann_mse, xgb_mse, lr_mse, rf_mse],
-        "r2": [msbos_r2, ann_adj_r2, xgb_adj_r2, lr_adj_r2, rf_adj_r2]
+        "model": ["msbos", "ann", "xgboost", "lr", "rf", "mlp"],
+        "mse": [msbos_mse, ann_mse, xgb_mse, lr_mse, rf_mse, mlp_mse],
+        "r2": [msbos_r2, ann_adj_r2, xgb_adj_r2, lr_adj_r2, rf_adj_r2, mlp_adj_r2]
     }
 )
 evaluation_result_df.to_csv("output/model_evaluation_results.csv", index=False)
@@ -156,3 +178,6 @@ save_blandaltman(y_test.values, adjust_pred_value(lr_y_pred), "lr_bland_altman_p
 
 save_blandaltman(y_test.values, rf_y_pred, "rf_bland_altman_plot_raw")
 save_blandaltman(y_test.values, adjust_pred_value(rf_y_pred), "rf_bland_altman_plot_adj")
+
+save_blandaltman(y_test.values, mlp_y_pred, "mlp_bland_altman_plot_raw")
+save_blandaltman(y_test.values, adjust_pred_value(mlp_y_pred), "mlp_bland_altman_plot_adj")
