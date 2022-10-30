@@ -20,7 +20,7 @@ param_search_conductor = ParamGridSearch(cv)
 param_search_conductor.conduct_current_practice_cv()
 
 # =======================================================================
-# Current practice (msbos) cv
+# Linear Regression cv
 # =======================================================================
 param_search_conductor.conduct_lr_cv()
 
